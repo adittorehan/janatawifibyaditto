@@ -81,6 +81,7 @@ def datapage(request, id):
         form = StockDataForm(request.POST, instance=get_object_or_404(StockData, id=id))
         if form.is_valid():
             form.save()
+            return redirect('stockmarketapp:homepage')
     return render(request,
                   'stockmarketapp/dataform.html',
                   context={'data_form': form,
@@ -100,9 +101,10 @@ def delete(request, id):
 def add_data(request):
     form = StockDataForm()
     if request.method == 'POST':
-        form = StockDataForm(request.POST, instance=get_object_or_404(StockData, id=id))
+        form = StockDataForm(request.POST)
         if form.is_valid():
             form.save()
+            return redirect('stockmarketapp:homepage')
     return render(request,
                   'stockmarketapp/adddata.html',
                   context={'data_form': form,

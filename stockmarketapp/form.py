@@ -11,5 +11,10 @@ class StockDataForm(ModelForm):
         }
 
         widgets = {
-            "_date": DateInput
+            "_date": DateInput(attrs={
+                "placeholder": "YYYY-Month-Day, eg. 2022-03-17"
+            })
+
         }
+
+
