@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{% static 'images/janatewifi-logo.jpg' %}" type="image/png">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script defer src="{% static 'js/main.js' %}"></script>
+    <title>Stock Market App</title>
+    <style>
+        input[type=text],
+        input[type=date],
+        input[type=number] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type=submit] {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type=submit]:hover {
+            background-color: #45a049;
+        }
+
+        .main {
+            max-width: 600px;
+            margin: auto;
+            border-radius: 5px;
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        .errors {
+            color: red;
+            list-style-type: none;            
+        }
+    </style>
+</head>
+
+<body>
+    <div class="topnav" id="myTopnav">
+      <a href="{%url 'stockmarketapp:homepage' %}" >Home</a>
+      <a href="{%url 'stockmarketapp:add_data' %}" class="active">Add Data</a>
+    </div>
+    <h2>Stock Market Add Data Form</h2>
+
+    <h3 class=".form-error">{{ data_form.non_field_errors}}</h3>
+
+    <form class="main" action="" method="post">
+        {% csrf_token %}
+
+        {% for field in data_form %}
+
+        {{ field.label_tag }} {{ field }} <p class="errors"> {{field.errors|striptags}} </p>
+
+        {% endfor %}
+        
+        <input type="submit" name="save" value="Save">
+        
+    </form>
+
+    
+
+
+
+</body>
+
+</html>

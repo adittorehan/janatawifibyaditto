@@ -1,17 +1,21 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="{% static 'images/janatewifi-logo.jpg' %}" type="image/png">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script defer src="{% static 'js/main.js' %}"></script>
     <title>Stock Market App</title>
     <style>
         .stockmarketdata {
             font-family: Arial, Helvetica, sans-serif;
             border-collapse: collapse;
-            width: 100%;
+            width: 80%;
+            margin: auto;
         }
 
         .stockmarketdata td,
@@ -36,31 +40,176 @@
             color: white;
         }
 
+        h2 {
+            text-align: center;
+        }
+
+        #myChart {
+            overflow: scroll;
+        }
     </style>
 </head>
-<body>
-<h2>Stock Market App</h2>
-<table class="stockmarketdata">
-    <tr>
-        <th>Date</th>
-        <th>Trade Code</th>
-        <th>High</th>
-        <th>Low</th>
-        <th>Open</th>
-        <th>Close</th>
-        <th>Volume</th>
-    </tr>
 
-    {% for data in data_list %}
-    <tr>
-        {% for key, value in data.items %}
-            <td> {{ value }} </td>
+<body>
+
+    <div class="topnav" id="myTopnav">
+        <a href="{%url 'stockmarketapp:homepage' %}" class="active">Home</a>
+        <a href="{%url 'stockmarketapp:add_data' %}">Add Data</a>
+    </div>
+
+    <h2>Stock Market App</h2>
+    <h3>Chart</h3>
+
+    <select class="dropdown" id="yaxis" onchange="changeLineColumn()">
+        <option value="close" selected>Close</option>
+        <option value="trade_code">Trade Code</option>
+    </select>
+
+    <canvas id="myChart" width="400" height="400"></canvas>
+
+
+    <h3>Table Visualization</h3>
+    <table class="stockmarketdata">
+        <tr>
+            <th>No.</th>
+            <th>Date</th>
+            <th>Trade Code</th>
+            <th>High</th>
+            <th>Low</th>
+            <th>Open</th>
+            <th>Close</th>
+            <th>Volume</th>
+        </tr>
+
+        {% for data in page_obj %}
+
+        <tr data-href="{% url 'stockmarketapp:dataform' data.id %}">
+
+            <td> {{ data.id }}</td>
+            <td> {{ data.date }}</td>
+            <td> {{ data.trade_code }}</td>
+            <td> {{ data.high }}</td>
+            <td> {{ data.low }}</td>
+            <td> {{ data.open }}</td>
+            <td> {{ data.close }}</td>
+            <td> {{ data.volume }}</td>
+
+        </tr>
+
         {% endfor %}
 
-    </tr>
-    {% endfor %}
 
 
-</table>
+
+    </table>
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; First Page</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">Last Page&raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const rows = document.querySelectorAll("tr[data-href]")
+
+            rows.forEach(row => {
+                row.addEventListener("click", () => {
+                    window.open(row.dataset.href, '_blank');
+                })
+            })
+        })
+
+        // Ajax call to get data
+        const dataUrl = 'chart-data/'
+        let chartData, close_values, trade_code, volume, date;
+        const config = {
+
+            options: {
+                scales: {
+                    // Can configure scaling here
+                },
+            }
+        };
+        const ctx = document.getElementById('myChart').getContext('2d');
+
+        // Rendering the chart
+        let stockChart;
+
+
+        $.ajax({
+            method: 'GET',
+            url: dataUrl,
+            success: function (responeData) {
+                close_values = responeData.close;
+                trade_code = responeData.trade_code;
+                volume = responeData.volume;
+                date = responeData.date;
+                drawChart()
+
+            },
+            error: function (error) {
+                console.log(`Error: ${error}`)
+            }
+        })
+
+        function drawChart() {
+
+            const yaxis = document.getElementById("yaxis").value
+            let xAxis;
+            
+            if (yaxis == "trade_code") {
+                
+                xAxis = trade_code
+            }
+            else {
+               
+                xAxis = date
+            }            
+            config.data = {
+                labels: xAxis,
+                datasets: [{
+                    type: 'line',
+                    label: 'Close Line Chart',
+                    backgroundColor: 'rgb(255, 99, 132)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: close_values,
+                },
+                {
+                    type: 'bar',
+                    label: 'Volume Bar Chart',
+                    backgroundColor: 'rgb(0,128,0)',
+                    borderColor: 'rgb(0,128,0)',
+                    data: volume,
+                }
+                ]
+            };
+
+            stockChart = new Chart(
+                ctx,
+                config
+            );
+
+        }
+        function changeLineColumn() {
+            stockChart.destroy()
+            drawChart()
+        }
+
+    </script>
 </body>
+
 </html>
