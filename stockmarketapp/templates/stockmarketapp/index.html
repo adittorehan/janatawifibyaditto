@@ -40,12 +40,29 @@
             color: white;
         }
 
-        h2 {
+        h2,
+        h3 {
             text-align: center;
         }
 
         #myChart {
             overflow: scroll;
+        }
+
+        td a {
+            display: inline-block;
+            text-decoration: none;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        a.update {
+            background-color: green;
+        }
+
+        a.delete {
+            background-color: red;
         }
     </style>
 </head>
@@ -60,9 +77,11 @@
     <h2>Stock Market App</h2>
     <h3>Chart</h3>
 
-    <select class="dropdown" id="yaxis" onchange="changeLineColumn()">
-        <option value="close" selected>Close</option>
-        <option value="trade_code">Trade Code</option>
+    <select class="dropdown" id="trade_codes" onchange="changeLineColumn()">
+
+        {% for trade_code in trade_codes%}
+        <option value="{{ trade_code }}" {% if forloop.first %} selected {% endif %}>{{ trade_code }}</option>
+        {% endfor %}
     </select>
 
     <canvas id="myChart" width="400" height="400"></canvas>
@@ -79,6 +98,7 @@
             <th>Open</th>
             <th>Close</th>
             <th>Volume</th>
+            <th>Action</th>
         </tr>
 
         {% for data in page_obj %}
@@ -93,6 +113,10 @@
             <td> {{ data.open }}</td>
             <td> {{ data.close }}</td>
             <td> {{ data.volume }}</td>
+            <td>
+                <a class="update" href="{% url 'stockmarketapp:dataform' data.id %}"> Update </a>
+                <a class="delete" href="{% url 'stockmarketapp:delete' data.id%}"> Delete </a>
+            </td>
 
         </tr>
 
@@ -123,18 +147,18 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const rows = document.querySelectorAll("tr[data-href]")
+        // document.addEventListener('DOMContentLoaded', () => {
+        //     const rows = document.querySelectorAll("tr[data-href]")
 
-            rows.forEach(row => {
-                row.addEventListener("click", () => {
-                    window.open(row.dataset.href, '_blank');
-                })
-            })
-        })
+        //     rows.forEach(row => {
+        //         row.addEventListener("click", () => {
+        //             window.open(row.dataset.href, '_blank');
+        //         })
+        //     })
+        // })
 
-        // Ajax call to get data
-        const dataUrl = 'chart-data/'
+
+
         let chartData, close_values, trade_code, volume, date;
         const config = {
 
@@ -150,64 +174,58 @@
         let stockChart;
 
 
-        $.ajax({
-            method: 'GET',
-            url: dataUrl,
-            success: function (responeData) {
-                close_values = responeData.close;
-                trade_code = responeData.trade_code;
-                volume = responeData.volume;
-                date = responeData.date;
-                drawChart()
 
-            },
-            error: function (error) {
-                console.log(`Error: ${error}`)
-            }
-        })
 
         function drawChart() {
 
-            const yaxis = document.getElementById("yaxis").value
-            let xAxis;
-            
-            if (yaxis == "trade_code") {
-                
-                xAxis = trade_code
-            }
-            else {
-               
-                xAxis = date
-            }            
-            config.data = {
-                labels: xAxis,
-                datasets: [{
-                    type: 'line',
-                    label: 'Close Line Chart',
-                    backgroundColor: 'rgb(255, 99, 132)',
-                    borderColor: 'rgb(255, 99, 132)',
-                    data: close_values,
-                },
-                {
-                    type: 'bar',
-                    label: 'Volume Bar Chart',
-                    backgroundColor: 'rgb(0,128,0)',
-                    borderColor: 'rgb(0,128,0)',
-                    data: volume,
-                }
-                ]
-            };
+            const trade_code = document.getElementById("trade_codes").value
 
-            stockChart = new Chart(
-                ctx,
-                config
-            );
+
+            $.ajax({
+                method: 'GET',
+                url: `chart-data/${trade_code}`,
+                success: function (responeData) {
+                    close_values = responeData.close;
+                    volume = responeData.volume;
+                    date = responeData.date;
+                    config.data = {
+                        labels: date,
+                        datasets: [{
+                            type: 'line',
+                            label: 'Close Line Chart',
+                            backgroundColor: 'rgb(255, 99, 132)',
+                            borderColor: 'rgb(255, 99, 132)',
+                            data: close_values,
+                        },
+                        {
+                            type: 'bar',
+                            label: 'Volume Bar Chart',
+                            backgroundColor: 'rgb(0,128,0)',
+                            borderColor: 'rgb(0,128,0)',
+                            data: volume,
+                        }
+                        ]
+                    };
+
+                    stockChart = new Chart(
+                        ctx,
+                        config
+                    );
+
+                },
+                error: function (error) {
+                    console.log(`Error: ${error}`)
+                }
+            })
+
+
 
         }
         function changeLineColumn() {
-            stockChart.destroy()
+            if (typeof (stockChart) != "undefined") stockChart.destroy()
             drawChart()
         }
+        drawChart()
 
     </script>
 </body>
