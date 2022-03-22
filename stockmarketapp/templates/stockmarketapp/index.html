@@ -100,62 +100,15 @@
             <th>Volume</th>
             <th>Action</th>
         </tr>
-
-        {% for data in page_obj %}
-
-        <tr data-href="{% url 'stockmarketapp:dataform' data.id %}">
-
-            <td> {{ data.id }}</td>
-            <td> {{ data.date }}</td>
-            <td> {{ data.trade_code }}</td>
-            <td> {{ data.high }}</td>
-            <td> {{ data.low }}</td>
-            <td> {{ data.open }}</td>
-            <td> {{ data.close }}</td>
-            <td> {{ data.volume }}</td>
-            <td>
-                <a class="update" href="{% url 'stockmarketapp:dataform' data.id %}"> Update </a>
-                <a class="delete" href="{% url 'stockmarketapp:delete' data.id%}"> Delete </a>
-            </td>
-
-        </tr>
-
-        {% endfor %}
-
-
-
+        
 
     </table>
-    <div class="pagination">
-        <span class="step-links">
-            {% if page_obj.has_previous %}
-            <a href="?page=1">&laquo; First Page</a>
-            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
-            {% endif %}
 
-            <span class="current">
-                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-            </span>
-
-            {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}">Last Page&raquo;</a>
-            {% endif %}
-        </span>
-    </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
     <script>
 
-        // document.addEventListener('DOMContentLoaded', () => {
-        //     const rows = document.querySelectorAll("tr[data-href]")
-
-        //     rows.forEach(row => {
-        //         row.addEventListener("click", () => {
-        //             window.open(row.dataset.href, '_blank');
-        //         })
-        //     })
-        // })
+        
 
 
 
@@ -188,6 +141,40 @@
                     close_values = responeData.close;
                     volume = responeData.volume;
                     date = responeData.date;
+                    open_values = responeData.open;
+                    high = responeData.high;
+                    low = responeData.low;
+                    ids = responeData.id;
+                    let table = document.querySelector(".stockmarketdata")
+                    $(".stockmarketdata tr>td").remove();
+                    for (let i = 0; i < ids.length; i++) {
+
+                        let row = table.insertRow(i + 1)
+                        let id_cell = row.insertCell(0),
+                            date_cell = row.insertCell(1),
+                            trade_cell = row.insertCell(2),
+                            high_cell = row.insertCell(3),
+                            low_cell = row.insertCell(4),
+                            open_cell = row.insertCell(5),
+                            close_cell = row.insertCell(6),
+                            volume_cell = row.insertCell(7),
+                            action_cell = row.insertCell(8);
+
+                        id_cell.innerHTML = ids[i]
+                        date_cell.innerHTML = date[i]
+                        trade_cell.innerHTML = trade_code
+                        high_cell.innerHTML = high[i]
+                        low_cell.innerHTML = low[i]
+                        open_cell.innerHTML = open_values[i]
+                        close_cell.innerHTML = close_values[i]
+                        volume_cell.innerHTML = volume[i]
+                        action_cell.innerHTML = `<a class="update" href="dataform/${ids[i]}"> Update </a> <a class="delete" href="delete/${ids[i]}"> Delete </a>`
+
+
+
+                    }
+
+
                     config.data = {
                         labels: date,
                         datasets: [{
@@ -206,6 +193,7 @@
                         }
                         ]
                     };
+
 
                     stockChart = new Chart(
                         ctx,

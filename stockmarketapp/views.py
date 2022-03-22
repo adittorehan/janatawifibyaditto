@@ -48,21 +48,17 @@ def index(request):
 # Get Stock Data as JSON for chart
 
 def get_data(request, trade_code=None):
-    close = []
-    date = []
-    volume = []
 
     data_of_trade = StockData.objects.all().order_by('_date', 'id').filter(trade_code=trade_code)
-    for value in data_of_trade:
-        close.append(value.close)
-        volume.append(value.volume)
-        date.append(value.date)
-
     data = {
-        "close": close,
-        "date": date,
-        "volume": volume
-
+        "id": [val.id for val in data_of_trade],
+        "trade_code": trade_code,
+        "high": [val.high for val in data_of_trade],
+        "low": [val.low for val in data_of_trade],
+        "open": [val.open for val in data_of_trade],
+        "close": [val.close for val in data_of_trade],
+        "date": [val.date for val in data_of_trade],
+        "volume": [val.volume for val in data_of_trade]
     }
     return JsonResponse(data)
 
