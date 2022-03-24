@@ -77,14 +77,24 @@
     <h2>Stock Market App</h2>
     <h3>Chart</h3>
 
-    <select class="dropdown" id="trade_codes" onchange="changeLineColumn()">
+    <div class="chart-controls">
+        <div class="trade-container">
+            <select class="dropdown" id="trade_codes" onchange="changeLineColumn()">
 
-        {% for trade_code in trade_codes%}
-        <option value="{{ trade_code }}" {% if forloop.first %} selected {% endif %}>{{ trade_code }}</option>
-        {% endfor %}
-    </select>
+                {% for trade_code in trade_codes%}
+                <option value="{{ trade_code }}" {% if forloop.first %} selected {% endif %}>{{ trade_code }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="show-bar">
+            <button onclick="toggleVolume()">Show Volume Bar</button>
+        </div>
+    </div>
 
-    <canvas id="myChart" width="400" height="400"></canvas>
+
+    <div class="chart-container">
+        <canvas id="myChart"></canvas>
+    </div>
 
 
     <h3>Table Visualization</h3>
@@ -100,7 +110,7 @@
             <th>Volume</th>
             <th>Action</th>
         </tr>
-        
+
 
     </table>
 
@@ -108,7 +118,7 @@
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script>
 
-        
+
 
 
 
@@ -119,6 +129,7 @@
                 scales: {
                     // Can configure scaling here
                 },
+                maintainAspectRatio: false
             }
         };
         const ctx = document.getElementById('myChart').getContext('2d');
@@ -126,7 +137,7 @@
         // Rendering the chart
         let stockChart;
 
-
+        let hideVolume = true;
 
 
         function drawChart() {
@@ -174,25 +185,31 @@
 
                     }
 
+                    const volumeBarDataset =
+                        config.data = {
+                            labels: date,
+                            datasets: [
+                                {
+                                    type: 'line',
+                                    label: 'Close Line Chart',
+                                    backgroundColor: 'rgb(255, 99, 132)',
+                                    borderColor: 'rgb(255, 99, 132)',
+                                    data: close_values,
+                                },
+                                {
+                                    type: 'bar',
+                                    label: 'Volume Bar Chart',
+                                    backgroundColor: 'rgb(0,128,0)',
+                                    borderColor: 'rgb(0,128,0)',
+                                    data: volume
+                                }
+                            ],
 
-                    config.data = {
-                        labels: date,
-                        datasets: [{
-                            type: 'line',
-                            label: 'Close Line Chart',
-                            backgroundColor: 'rgb(255, 99, 132)',
-                            borderColor: 'rgb(255, 99, 132)',
-                            data: close_values,
-                        },
-                        {
-                            type: 'bar',
-                            label: 'Volume Bar Chart',
-                            backgroundColor: 'rgb(0,128,0)',
-                            borderColor: 'rgb(0,128,0)',
-                            data: volume,
-                        }
-                        ]
-                    };
+                        };
+
+                    if (hideVolume === true) {
+                        config.data.datasets.pop()
+                    }
 
 
                     stockChart = new Chart(
@@ -209,6 +226,27 @@
 
 
         }
+        let showBar = false
+        function toggleVolume() {
+            if (!showBar) {
+                showBar = true
+                hideVolume = false
+                stockChart.destroy()
+                drawChart();
+                document.querySelector('.chart-container').style.height = '500px'
+                document.querySelector('.show-bar button').innerHTML = "Hide Volume Bar"
+
+            }
+            else {
+                showBar = false
+                hideVolume = true
+                stockChart.destroy()
+                drawChart();
+                document.querySelector('.chart-container').style.height = '300px'
+                document.querySelector('.show-bar button').innerHTML = "Show Volume Bar"
+            }
+        }
+
         function changeLineColumn() {
             if (typeof (stockChart) != "undefined") stockChart.destroy()
             drawChart()
