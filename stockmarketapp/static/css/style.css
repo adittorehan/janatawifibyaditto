@@ -50,7 +50,7 @@
 
 .chart-container {
   padding: 10px;
-  height: 300px;
+  height: 400px;
   margin: auto;
 }
 
@@ -59,7 +59,7 @@
 }
 
 .chart-controls {
-  width: 300px;
+  width: 150px;
   margin: auto;
   padding: 10px 0;
 }

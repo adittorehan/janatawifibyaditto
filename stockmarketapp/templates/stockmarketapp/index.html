@@ -86,9 +86,7 @@
                 {% endfor %}
             </select>
         </div>
-        <div class="show-bar">
-            <button onclick="toggleVolume()">Show Volume Bar</button>
-        </div>
+
     </div>
 
 
@@ -128,6 +126,10 @@
             options: {
                 scales: {
                     // Can configure scaling here
+                    volume: {
+                        position: 'right'
+                    }
+
                 },
                 maintainAspectRatio: false
             }
@@ -137,7 +139,6 @@
         // Rendering the chart
         let stockChart;
 
-        let hideVolume = true;
 
 
         function drawChart() {
@@ -195,21 +196,22 @@
                                     backgroundColor: 'rgb(255, 99, 132)',
                                     borderColor: 'rgb(255, 99, 132)',
                                     data: close_values,
+                                    yAxisID: 'close'
                                 },
                                 {
                                     type: 'bar',
                                     label: 'Volume Bar Chart',
                                     backgroundColor: 'rgb(0,128,0)',
                                     borderColor: 'rgb(0,128,0)',
-                                    data: volume
+                                    data: volume,
+                                    yAxisID: 'volume',
+
                                 }
                             ],
 
                         };
 
-                    if (hideVolume === true) {
-                        config.data.datasets.pop()
-                    }
+
 
 
                     stockChart = new Chart(
@@ -226,25 +228,15 @@
 
 
         }
-        let showBar = false
-        function toggleVolume() {
-            if (!showBar) {
-                showBar = true
-                hideVolume = false
-                stockChart.destroy()
-                drawChart();
-                document.querySelector('.chart-container').style.height = '500px'
-                document.querySelector('.show-bar button').innerHTML = "Hide Volume Bar"
 
-            }
-            else {
-                showBar = false
-                hideVolume = true
-                stockChart.destroy()
-                drawChart();
-                document.querySelector('.chart-container').style.height = '300px'
-                document.querySelector('.show-bar button').innerHTML = "Show Volume Bar"
-            }
+        function toggleVolume() {
+            showBar = true
+            hideVolume = false
+            stockChart.destroy()
+            drawChart();
+            // document.querySelector('.chart-container').style.height = '500px'           
+
+
         }
 
         function changeLineColumn() {

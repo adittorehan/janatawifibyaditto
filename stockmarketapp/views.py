@@ -48,7 +48,6 @@ def index(request):
 # Get Stock Data as JSON for chart
 
 def get_data(request, trade_code=None):
-
     data_of_trade = StockData.objects.all().order_by('_date', 'id').filter(trade_code=trade_code)
     data = {
         "id": [val.id for val in data_of_trade],
@@ -97,7 +96,8 @@ def add_data(request):
             return redirect('stockmarketapp:homepage')
     return render(request,
                   'stockmarketapp/adddata.html',
-                  context={'data_form': form,
-                           'id': id
-                           }
+                  context={
+                      'data_form': form,
+                      'id': id
+                  }
                   )
