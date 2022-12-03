@@ -6,64 +6,12 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="{% static 'images/janatewifi-logo.jpg' %}" type="image/png">
+    <link rel="shortcut icon" href="{% static 'images/janatawifi-logo.jpg' %}" type="image/png">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <script defer src="{% static 'js/main.js' %}"></script>
     <title>Stock Market App</title>
     <style>
-        .stockmarketdata {
-            font-family: Arial, Helvetica, sans-serif;
-            border-collapse: collapse;
-            width: 80%;
-            margin: auto;
-        }
 
-        .stockmarketdata td,
-        .stockmarketdata th {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
-
-        .stockmarketdata tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        .stockmarketdata tr:hover {
-            background-color: #ddd;
-        }
-
-        .stockmarketdata th {
-            padding-top: 12px;
-            padding-bottom: 12px;
-            text-align: left;
-            background-color: #04AA6D;
-            color: white;
-        }
-
-        h2,
-        h3 {
-            text-align: center;
-        }
-
-        #myChart {
-            overflow: scroll;
-        }
-
-        td a {
-            display: inline-block;
-            text-decoration: none;
-            color: white;
-            padding: 10px;
-            border-radius: 4px;
-        }
-
-        a.update {
-            background-color: green;
-        }
-
-        a.delete {
-            background-color: red;
-        }
     </style>
 </head>
 
@@ -86,7 +34,6 @@
                 {% endfor %}
             </select>
         </div>
-
     </div>
 
 
@@ -108,21 +55,18 @@
             <th>Volume</th>
             <th>Action</th>
         </tr>
-
-
     </table>
+
+<!--    Design Footer-->
+    <footer class="footer">
+        <h3>&copy; Copyright Aditto Rehan</h3>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script>
-
-
-
-
-
         let chartData, close_values, trade_code, volume, date;
         const config = {
-
             options: {
                 scales: {
                     // Can configure scaling here
@@ -135,17 +79,9 @@
             }
         };
         const ctx = document.getElementById('myChart').getContext('2d');
-
-        // Rendering the chart
         let stockChart;
-
-
-
         function drawChart() {
-
             const trade_code = document.getElementById("trade_codes").value
-
-
             $.ajax({
                 method: 'GET',
                 url: `chart-data/${trade_code}`,
@@ -160,7 +96,6 @@
                     let table = document.querySelector(".stockmarketdata")
                     $(".stockmarketdata tr>td").remove();
                     for (let i = 0; i < ids.length; i++) {
-
                         let row = table.insertRow(i + 1)
                         let id_cell = row.insertCell(0),
                             date_cell = row.insertCell(1),
@@ -171,7 +106,6 @@
                             close_cell = row.insertCell(6),
                             volume_cell = row.insertCell(7),
                             action_cell = row.insertCell(8);
-
                         id_cell.innerHTML = ids[i]
                         date_cell.innerHTML = date[i]
                         trade_cell.innerHTML = trade_code
@@ -181,8 +115,6 @@
                         close_cell.innerHTML = close_values[i]
                         volume_cell.innerHTML = volume[i]
                         action_cell.innerHTML = `<a class="update" href="dataform/${ids[i]}"> Update </a> <a class="delete" href="delete/${ids[i]}"> Delete </a>`
-
-
 
                     }
 
@@ -208,43 +140,28 @@
 
                                 }
                             ],
-
                         };
-
-
-
-
                     stockChart = new Chart(
                         ctx,
                         config
                     );
-
                 },
                 error: function (error) {
                     console.log(`Error: ${error}`)
                 }
             })
-
-
-
         }
-
         function toggleVolume() {
             showBar = true
             hideVolume = false
             stockChart.destroy()
             drawChart();
-            // document.querySelector('.chart-container').style.height = '500px'           
-
-
         }
-
         function changeLineColumn() {
             if (typeof (stockChart) != "undefined") stockChart.destroy()
             drawChart()
         }
         drawChart()
-
     </script>
 </body>
 

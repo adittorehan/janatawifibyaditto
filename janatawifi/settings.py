@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-$m*qc(=7t&$4#wuvc0$h%zjhek5e40vb2ty#@%hv_@8c53@5wg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['adittorehan.pythonanywhere.com']
 
 # Application definition
 
@@ -73,10 +73,12 @@ WSGI_APPLICATION = 'janatawifi.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'adittorehan$janatawifi',
+        'USER': 'adittorehan',
+        'PASSWORD': 'Ars757501/*',
+        'HOST': 'adittorehan.mysql.pythonanywhere-services.com'
     }
-
 }
 
 # Password validation
@@ -112,6 +114,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+print("\n\n******")
+print(os.path.join(BASE_DIR, "static"))
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
